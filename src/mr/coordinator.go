@@ -47,6 +47,7 @@ func (c *Coordinator) server() {
 //
 func (c *Coordinator) Done() bool {
 	ret := false
+	ret = true
 
 	// Your code here.
 
