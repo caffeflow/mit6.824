@@ -31,6 +31,7 @@ func main() {
 
 	mapf, reducef := loadPlugin(os.Args[1])
 
+	// ===================== Mapper =======================
 	//
 	// read each input file,
 	// pass it to Map,
@@ -47,7 +48,7 @@ func main() {
 			log.Fatalf("cannot read %v", filename)
 		}
 		file.Close()
-		kva := mapf(filename, string(content))
+		kva := mapf(filename, string(content)) // mapf参数: 文件名;文件的内容
 		intermediate = append(intermediate, kva...)
 	}
 
@@ -59,7 +60,9 @@ func main() {
 
 	sort.Sort(ByKey(intermediate))
 
-	oname := "mr-out-0"
+	// ==================   Reducer    ==========================
+
+	oname := "mr-out-0" // 0 表示 Reducer 的编号
 	ofile, _ := os.Create(oname)
 
 	//
@@ -68,10 +71,12 @@ func main() {
 	//
 	i := 0
 	for i < len(intermediate) {
+		// [i,j-1] 在相同key区间.
 		j := i + 1
 		for j < len(intermediate) && intermediate[j].Key == intermediate[i].Key {
 			j++
 		}
+		// " 按key, 折叠value到values "  --> 传给reducef函数
 		values := []string{}
 		for k := i; k < j; k++ {
 			values = append(values, intermediate[k].Value)
