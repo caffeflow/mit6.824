@@ -10,9 +10,7 @@ import "net/http"
 
 type Coordinator struct {
 	// Your definitions here.
-	files_todo []string
-	fils_done  []string
-	nReduce    int
+
 }
 
 // Your code here -- RPC handlers for the worker to call.
@@ -65,8 +63,6 @@ func (c *Coordinator) Done() bool {
 func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	c := Coordinator{}
 	// Your code here.
-	c.files_todo = files
-	c.nReduce = nReduce
 
 	//
 	c.server()
