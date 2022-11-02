@@ -30,4 +30,5 @@ func main() {
 	}
 
 	time.Sleep(time.Second)
+	fmt.Printf("mrcoordinator 运行结束\n")
 }

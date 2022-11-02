@@ -56,16 +56,6 @@ func (t *Arith) Divide(args *Args, quotient *Quotient) error { // 计算 a / b  
 	quotient.Quo = args.A / args.B
 	quotient.Rem = args.A % args.B
 	return nil
-	rpc.Register(c)
-	rpc.HandleHTTP()
-	l, e := net.Listen("tcp", ":1234")
-	//sockname := coordinatorSock()
-	//os.Remove(sockname)
-	//l, e := net.Listen("unix", sockname)
-	if e != nil {
-		log.Fatal("listen error:", e)
-	}
-	go http.Serve(l, nil)
 }
 
 func main() {
