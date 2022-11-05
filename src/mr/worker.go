@@ -70,8 +70,9 @@ func Worker(mapf func(string, string) []KeyValue, reducef func(string, []string)
 			break
 		}
 		if ok && applyTaskReply.token == "" { // 响应，但是申请失败
-			fmt.Printf("call true, but apply false\n")
+			fmt.Printf("call true, but apply false, 稍后自动再试一试\n")
 			time.Sleep(time.Minute * 1)
+			continue
 		}
 		// 绑定任务
 		bind := Bind{
@@ -83,6 +84,19 @@ func Worker(mapf func(string, string) []KeyValue, reducef func(string, []string)
 			nReduce:             applyTaskReply.nReduce,
 			nMap:                applyTaskReply.nMap,
 		}
+
+		// 异步开启心跳
+		heartArgs := &HeartArgs{token: bind.workerToken, taskType: bind.taskType, time: time.Now()}
+		heartReply := &HeartReply{}
+		go call("coordinator.CompleteTask", heartArgs, heartReply)
+		go func() {
+			for {
+				time.Sleep(time.Duration(bind.heartIntervalMinute / 4))
+				if time.Now().After(heartReply.time.Add(time.Duration(int64(time.Minute) * int64(bind.heartIntervalMinute)))) {
+					fmt.Printf("心跳预期 token=%v", bind.workerToken)
+				}
+			}
+		}()
 
 		if bind.taskType == mapType { // map task
 			filename := bind.files[0] //
@@ -209,13 +223,6 @@ func Worker(mapf func(string, string) []KeyValue, reducef func(string, []string)
 		time.Sleep(time.Second * 10) // 继续尝试申请任务
 	}
 	return
-}
-
-func CallHeart(args *HeartArgs, reply *HeartReply) {
-
-}
-func CallCompleteTask(args *CompleteTaskArgs, reply *CompleteTaskReply) {
-
 }
 
 //
